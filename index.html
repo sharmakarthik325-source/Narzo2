@@ -3,253 +3,331 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student OS | Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Nexus | Advanced Student OS</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: rgba(30, 41, 59, 0.7);
-            --accent-color: #8b5cf6;
-            --text-main: #f8fafc;
-            --text-dim: #94a3b8;
-            --border: rgba(255, 255, 255, 0.1);
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.3);
+            --bg-dark: #020617;
+            --glass: rgba(15, 23, 42, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-high: #f8fafc;
+            --text-low: #64748b;
+            --success: #10b981;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at top right, #1e1b4b, #020617);
+            color: var(--text-high);
             display: grid;
-            grid-template-columns: 240px 1fr;
+            grid-template-columns: 280px 1fr;
             min-height: 100vh;
+            overflow: hidden;
         }
 
-        /* Sidebar */
+        /* --- SIDEBAR --- */
         aside {
-            background: rgba(15, 23, 42, 0.9);
-            border-right: 1px solid var(--border);
-            padding: 2rem;
+            background: rgba(2, 6, 23, 0.8);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--glass-border);
+            padding: 2.5rem 1.5rem;
             display: flex;
             flex-direction: column;
-            gap: 2rem;
         }
 
-        .logo { font-weight: 800; font-size: 1.5rem; color: var(--accent-color); }
+        .brand { font-size: 1.5rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 3rem; display: flex; align-items: center; gap: 10px; }
+        .brand-dot { height: 8px; width: 8px; background: var(--primary); border-radius: 50%; box-shadow: 0 0 10px var(--primary); }
 
-        nav ul { list-style: none; }
-        nav li {
-            padding: 0.8rem 1rem;
-            margin-bottom: 0.5rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.3s;
-            color: var(--text-dim);
-        }
-        nav li:hover, nav li.active {
-            background: var(--accent-color);
-            color: white;
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            border-radius: 12px;
+            color: var(--text-low);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-weight: 500;
         }
 
-        /* Main Content */
+        .nav-link:hover, .nav-link.active {
+            background: var(--glass-border);
+            color: var(--text-high);
+        }
+
+        /* --- MAIN AREA --- */
         main {
-            padding: 2rem;
+            padding: 2rem 3rem;
             overflow-y: auto;
+            background: transparent;
         }
 
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 2rem;
+            margin-bottom: 3rem;
         }
 
-        .profile-area { display: flex; align-items: center; gap: 1rem; }
-        .avatar { width: 40px; height: 40px; background: var(--accent-color); border-radius: 50%; }
+        .search-bar {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            padding: 10px 20px;
+            border-radius: 30px;
+            width: 300px;
+            color: white;
+        }
 
-        /* Dashboard Grid */
+        /* --- DASHBOARD GRID --- */
         .dashboard-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: 2fr 1fr;
+            grid-template-rows: auto auto;
             gap: 1.5rem;
         }
 
-        .card {
-            background: var(--card-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 1.5rem;
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
         }
 
-        h3 { margin-bottom: 1rem; font-size: 1.1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+        h2 { font-size: 1.25rem; margin-bottom: 1.5rem; font-weight: 600; }
 
-        /* Task Tracker */
-        .input-group { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
-        input {
+        /* --- TASK TRACKER --- */
+        .task-input-container {
+            display: flex;
+            gap: 10px;
             background: rgba(0,0,0,0.2);
-            border: 1px solid var(--border);
+            padding: 8px;
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+        }
+
+        input[type="text"] {
+            background: transparent;
+            border: none;
+            outline: none;
             color: white;
-            padding: 0.5rem;
-            border-radius: 4px;
+            padding: 8px 12px;
             flex-grow: 1;
         }
-        button {
-            background: var(--accent-color);
-            color: white;
+
+        .btn-add {
+            background: var(--primary);
             border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 12px;
             cursor: pointer;
+            font-weight: 600;
+            box-shadow: 0 4px 15px var(--primary-glow);
         }
 
-        .task-list { list-style: none; }
         .task-item {
             display: flex;
-            justify-content: space-between;
-            background: rgba(255,255,255,0.05);
-            padding: 0.6rem;
-            margin-bottom: 0.5rem;
-            border-radius: 6px;
+            align-items: center;
+            padding: 12px;
+            background: rgba(255,255,255,0.03);
+            margin-bottom: 10px;
+            border-radius: 14px;
+            transition: 0.3s;
+            animation: slideIn 0.3s ease-out;
         }
-        .task-item.completed span { text-decoration: line-through; opacity: 0.5; }
 
-        /* Schedule */
-        .schedule-item {
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .task-item:hover { background: rgba(255,255,255,0.06); }
+        .checkbox { 
+            width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--primary); 
+            margin-right: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        .completed .checkbox { background: var(--primary); }
+        .completed span { text-decoration: line-through; color: var(--text-low); }
+
+        /* --- GPA VISUALIZER --- */
+        .stats-container {
             display: flex;
-            justify-content: space-between;
-            padding: 0.8rem 0;
-            border-bottom: 1px solid var(--border);
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
         }
-        .time { color: var(--accent-color); font-weight: 600; font-size: 0.9rem; }
 
-        @media (max-width: 768px) {
-            body { grid-template-columns: 1fr; }
-            aside { display: none; }
+        #gpaValue {
+            font-size: 4rem;
+            font-weight: 800;
+            background: linear-gradient(to bottom, #fff, #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* --- SCROLLBAR --- */
+        main::-webkit-scrollbar { width: 6px; }
+        main::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
+
+        @media (max-width: 1024px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+            body { grid-template-columns: 80px 1fr; }
+            .nav-link span, .brand span { display: none; }
         }
     </style>
 </head>
 <body>
 
     <aside>
-        <div class="logo">STUDENT.OS</div>
+        <div class="brand"><div class="brand-dot"></div><span>Nexus.</span></div>
         <nav>
-            <ul>
-                <li class="active">Dashboard</li>
-                <li>Schedule</li>
-                <li>Grades</li>
-                <li>Settings</li>
-            </ul>
+            <a href="#" class="nav-link active"><span>Dashboard</span></a>
+            <a href="#" class="nav-link"><span>Courses</span></a>
+            <a href="#" class="nav-link"><span>Analytics</span></a>
+            <a href="#" class="nav-link"><span>Resources</span></a>
+            <a href="#" class="nav-link" style="margin-top: auto;"><span>Settings</span></a>
         </nav>
     </aside>
 
     <main>
         <header>
             <div>
-                <h1 id="welcome">Welcome back, Alex!</h1>
-                <p id="current-date" style="color: var(--text-dim)"></p>
+                <h1>Hello, Alex 👋</h1>
+                <p style="color: var(--text-low)" id="live-date"></p>
             </div>
-            <div class="profile-area">
-                <span>Alex Johnson</span>
-                <div class="avatar"></div>
-            </div>
+            <input type="text" class="search-bar" placeholder="Search for notes, tasks...">
         </header>
 
         <div class="dashboard-grid">
-            <section class="card">
-                <h3>Task Tracker</h3>
-                <div class="input-group">
-                    <input type="text" id="taskInput" placeholder="New assignment...">
-                    <button onclick="addTask()">Add</button>
+            <section class="glass-card" style="grid-row: span 2;">
+                <h2>Academic Performance</h2>
+                <canvas id="gradeChart" height="200"></canvas>
+                <div style="margin-top: 2rem; display: flex; justify-content: space-around;">
+                    <div style="text-align: center;">
+                        <p style="color: var(--text-low); font-size: 0.8rem;">CURRENT GPA</p>
+                        <h3 id="gpaValue">4.0</h3>
+                    </div>
+                    <div style="text-align: center;">
+                        <p style="color: var(--text-low); font-size: 0.8rem;">CREDITS</p>
+                        <h3 style="font-size: 4rem; font-weight: 800;">120</h3>
+                    </div>
                 </div>
-                <ul id="taskList" class="task-list"></ul>
             </section>
 
-            <section class="card">
-                <h3>GPA Calculator</h3>
-                <p style="font-size: 0.8rem; margin-bottom: 1rem; color: var(--text-dim)">Enter grades (0.0 - 4.0) separated by commas.</p>
-                <div class="input-group">
-                    <input type="text" id="gpaInput" placeholder="e.g. 4.0, 3.7, 3.2">
-                    <button onclick="calculateGPA()">Calc</button>
+            <section class="glass-card">
+                <h2>Priority Tasks</h2>
+                <div class="task-input-container">
+                    <input type="text" id="taskInput" placeholder="Add a new assignment...">
+                    <button class="btn-add" onclick="taskManager.add()">Add</button>
                 </div>
-                <div id="gpaResult" style="font-size: 2rem; font-weight: bold; text-align: center;">--</div>
+                <div id="taskList"></div>
             </section>
 
-            <section class="card">
-                <h3>Today's Classes</h3>
-                <div class="schedule-item">
-                    <span>Advanced Mathematics</span>
-                    <span class="time">09:00 AM</span>
-                </div>
-                <div class="schedule-item">
-                    <span>Computer Science 101</span>
-                    <span class="time">11:30 AM</span>
-                </div>
-                <div class="schedule-item">
-                    <span>Art History</span>
-                    <span class="time">02:00 PM</span>
+            <section class="glass-card">
+                <h2>Up Next</h2>
+                <div class="schedule-list">
+                    <div class="task-item">
+                        <div style="color: var(--primary); font-weight: 800; margin-right: 15px;">10:30</div>
+                        <div>
+                            <p style="font-size: 0.9rem; font-weight: 600;">Data Structures</p>
+                            <p style="font-size: 0.75rem; color: var(--text-low);">Room 402 • Prof. Smith</p>
+                        </div>
+                    </div>
+                    <div class="task-item">
+                        <div style="color: var(--text-low); font-weight: 800; margin-right: 15px;">13:00</div>
+                        <div>
+                            <p style="font-size: 0.9rem; font-weight: 600;">UI/UX Seminar</p>
+                            <p style="font-size: 0.75rem; color: var(--text-low);">Virtual • Zoom</p>
+                        </div>
+                    </div>
                 </div>
             </section>
         </div>
     </main>
 
     <script>
-        // 1. Date Display
-        const dateDisplay = document.getElementById('current-date');
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        dateDisplay.innerText = new Date().toLocaleDateString(undefined, options);
-
-        // 2. Task Tracker Logic
-        let tasks = JSON.parse(localStorage.getItem('studentTasks')) || [];
-
-        function renderTasks() {
-            const list = document.getElementById('taskList');
-            list.innerHTML = '';
-            tasks.forEach((task, index) => {
-                const li = document.createElement('li');
-                li.className = `task-item ${task.completed ? 'completed' : ''}`;
-                li.innerHTML = `
-                    <span onclick="toggleTask(${index})" style="cursor:pointer">${task.text}</span>
-                    <button onclick="deleteTask(${index})" style="background:transparent; color:#ff4444; padding:0">✕</button>
-                `;
-                list.appendChild(li);
+        // --- 1. DATE & TIME ---
+        const updateDate = () => {
+            const now = new Date();
+            document.getElementById('live-date').innerText = now.toLocaleDateString('en-US', { 
+                weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' 
             });
-            localStorage.setItem('studentTasks', JSON.stringify(tasks));
-        }
+        };
+        updateDate();
 
-        function addTask() {
-            const input = document.getElementById('taskInput');
-            if (input.value.trim() === '') return;
-            tasks.push({ text: input.value, completed: false });
-            input.value = '';
-            renderTasks();
-        }
-
-        function toggleTask(index) {
-            tasks[index].completed = !tasks[index].completed;
-            renderTasks();
-        }
-
-        function deleteTask(index) {
-            tasks.splice(index, 1);
-            renderTasks();
-        }
-
-        // 3. GPA Calculator Logic
-        function calculateGPA() {
-            const input = document.getElementById('gpaInput').value;
-            const grades = input.split(',').map(n => parseFloat(n.trim())).filter(n => !isNaN(n));
+        // --- 2. TASK MANAGER (Encapsulated) ---
+        const taskManager = {
+            tasks: JSON.parse(localStorage.getItem('nexus_tasks')) || [
+                { id: 1, text: 'Finalize Thesis Outline', completed: false },
+                { id: 2, text: 'Submit React Lab', completed: true }
+            ],
             
-            if (grades.length === 0) return;
-            
-            const sum = grades.reduce((a, b) => a + b, 0);
-            const avg = (sum / grades.length).toFixed(2);
-            document.getElementById('gpaResult').innerText = avg;
-        }
+            save() {
+                localStorage.setItem('nexus_tasks', JSON.stringify(this.tasks));
+                this.render();
+            },
 
-        // Initial Load
-        renderTasks();
+            add() {
+                const input = document.getElementById('taskInput');
+                if (!input.value.trim()) return;
+                this.tasks.unshift({ id: Date.now(), text: input.value, completed: false });
+                input.value = '';
+                this.save();
+            },
+
+            toggle(id) {
+                this.tasks = this.tasks.map(t => t.id === id ? {...t, completed: !t.completed} : t);
+                this.save();
+            },
+
+            render() {
+                const container = document.getElementById('taskList');
+                container.innerHTML = this.tasks.map(t => `
+                    <div class="task-item ${t.completed ? 'completed' : ''}">
+                        <div class="checkbox" onclick="taskManager.toggle(${t.id})">
+                            ${t.completed ? '✓' : ''}
+                        </div>
+                        <span style="flex-grow: 1;">${t.text}</span>
+                    </div>
+                `).join('');
+            }
+        };
+
+        // --- 3. PERFORMANCE CHART ---
+        const ctx = document.getElementById('gradeChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4', 'Sem 5', 'Sem 6'],
+                datasets: [{
+                    label: 'GPA Trend',
+                    data: [3.4, 3.6, 3.5, 3.8, 3.9, 4.0],
+                    borderColor: '#6366f1',
+                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    borderWidth: 3,
+                    pointRadius: 5,
+                    pointBackgroundColor: '#6366f1'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { grid: { display: false }, ticks: { color: '#64748b' } },
+                    x: { grid: { display: false }, ticks: { color: '#64748b' } }
+                }
+            }
+        });
+
+        // Initialize
+        taskManager.render();
     </script>
 </body>
 </html>
